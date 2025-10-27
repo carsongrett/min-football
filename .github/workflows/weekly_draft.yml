@@ -1,0 +1,97 @@
+name: Weekly Draft Generator
+
+on:
+  schedule:
+    # Run every Sunday at 9:30 AM UTC
+    - cron: '30 9 * * 0'
+  workflow_dispatch:
+    inputs:
+      week:
+        description: 'Week number'
+        required: false
+        type: string
+      scope:
+        description: 'Scope (cfb/nfl)'
+        required: false
+        default: 'cfb'
+        type: choice
+        options:
+          - cfb
+          - nfl
+
+jobs:
+  generate-draft:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        scope: [cfb]
+        # Add nfl later when needed
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Calculate week number
+        id: week
+        run: |
+          if [ -n "${{ github.event.inputs.week }}" ]; then
+            WEEK="${{ github.event.inputs.week }}"
+          else
+            # Calculate current week (simplified - assumes Aug 1 start)
+            DAYS=$(( ($(date +%s) - $(date -d "$(date +%Y)-08-01" +%s)) / 86400 ))
+            WEEK=$(( DAYS / 7 + 1 ))
+            if [ $WEEK -lt 1 ]; then
+              WEEK=1
+            fi
+            if [ $WEEK -gt 17 ]; then
+              WEEK=17
+            fi
+          fi
+          echo "week=$WEEK" >> $GITHUB_OUTPUT
+          echo "Using week: $WEEK"
+
+      - name: Set scope
+        id: scope
+        run: |
+          SCOPE="${{ github.event.inputs.scope || 'cfb' }}"
+          echo "scope=$SCOPE" >> $GITHUB_OUTPUT
+          echo "Using scope: $SCOPE"
+
+      - name: Generate draft
+        env:
+          SEASON: ${{ github.event.inputs.season || '2025' }}
+          WEEK: ${{ steps.week.outputs.week }}
+          SCOPE: ${{ steps.scope.outputs.scope }}
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+        run: |
+          node scripts/generateDraft.mjs
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git diff --quiet || echo "has_changes=true" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: draft/week-${{ steps.week.outputs.week }}-${{ steps.scope.outputs.scope }}
+          title: "Draft: Week ${{ steps.week.outputs.week }} (${{ steps.scope.outputs.scope }})"
+          body: |
+            Auto-generated weekly draft for Week ${{ steps.week.outputs.week }}.
+            
+            **Scope:** ${{ steps.scope.outputs.scope }}
+            **Season:** ${{ github.event.inputs.season || '2025' }}
+            **Generated:** ${{ github.run_number }}
+            
+            Review and merge to publish.
+          commit-message: "Add draft for week ${{ steps.week.outputs.week }}"
+          labels: automated,draft
+

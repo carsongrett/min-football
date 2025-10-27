@@ -1,0 +1,154 @@
+{
+  "meta": {
+    "season": 2025,
+    "week": 0,
+    "scope": "cfb",
+    "generated_at": "2025-08-31T12:34:56Z",
+    "sources": ["example data"]
+  },
+  "top_games": [
+    {
+      "home": {
+        "name": "Fresno State",
+        "abbr": "FRES",
+        "logo": ""
+      },
+      "away": {
+        "name": "Georgia Southern",
+        "abbr": "GASO",
+        "logo": ""
+      },
+      "final": "28–24",
+      "recap_2s": "Georgia Southern led 24–14 entering the fourth quarter, but Fresno State's defense forced three turnovers and the Bulldogs scored on short fields. The Eagles had three drives inside the Fresno 30 in the final period but came away with zero points.",
+      "one_stat": "Turnover margin +3",
+      "why_it_mattered": "Fresno’s defensive coordinator dialed up aggressive blitzes on third down, forcing two strip-sacks. The short fields allowed the offense to overcome a sluggish 3.1 yards per carry on first-and-second down.",
+      "tags": ["upset", "late", "ranked-vs-unranked"],
+      "ids": {
+        "home_id": 278,
+        "away_id": 290,
+        "game_id": "2025-08-30-278-290"
+      }
+    },
+    {
+      "home": {
+        "name": "Arizona",
+        "abbr": "ARIZ",
+        "logo": ""
+      },
+      "away": {
+        "name": "Utah",
+        "abbr": "UTAH",
+        "logo": ""
+      },
+      "final": "31–28",
+      "recap_2s": "Utah mounted a 17-point comeback in the final quarter, capitalizing on Arizona turnovers and a suddenly porous Wildcat run defense. The Utes' dual-threat QB scored twice on scrambles in the last five minutes.",
+      "one_stat": "Fourth quarter: 207 rushing yards allowed",
+      "why_it_mattered": "Arizona’s defensive line wore down in the heat—six players rotated in the first three quarters, but only four were available late. Utah's tempo and inside-zone reads exposed the fatigue.",
+      "tags": ["comeback", "overtime", "ranked-vs-ranked"],
+      "ids": {
+        "home_id": 12,
+        "away_id": 254,
+        "game_id": "2025-08-29-12-254"
+      }
+    },
+    {
+      "home": {
+        "name": "Texas",
+        "abbr": "TEX",
+        "logo": ""
+      },
+      "away": {
+        "name": "Rice",
+        "abbr": "RICE",
+        "logo": ""
+      },
+      "final": "42–20",
+      "recap_2s": "Texas controlled the line of scrimmage on both sides, generating consistent pressure with four-man rushes while allowing only 2.9 yards per carry. Rice's explosive passing game (17.2 yards per completion) kept it competitive into the third quarter.",
+      "one_stat": "3.5 second average time to throw vs 2.2",
+      "why_it_mattered": "Rice's quarterback held the ball longer looking for deep shots, but Texas's edge rushers won individual matchups. The Owls' successful play-action shots in the first half disappeared as down-and-distance became less favorable.",
+      "tags": ["trench-control", "defensive-line"],
+      "ids": {
+        "home_id": 251,
+        "away_id": 242,
+        "game_id": "2025-08-28-251-242"
+      }
+    },
+    {
+      "home": {
+        "name": "Oklahoma",
+        "abbr": "OU",
+        "logo": ""
+      },
+      "away": {
+        "name": "Kansas State",
+        "abbr": "KSU",
+        "logo": ""
+      },
+      "final": "34–31",
+      "recap_2s": "Both offenses struggled to convert third downs (combined 8-of-29) due to predictable play-calling in passing situations. Oklahoma's quarterback found success on RPO keepers, but Kansas State's defense adjusted at halftime and forced three consecutive punts.",
+      "one_stat": "Third-down completion rate: 38%",
+      "why_it_mattered": "Both teams lived in 2nd-and-long, creating obvious passing downs. Oklahoma's offensive line struggled with pass protection on third and medium, allowing five sacks—two directly ended drives that crossed midfield.",
+      "tags": ["defensive-struggle", "one-score"],
+      "ids": {
+        "home_id": 201,
+        "away_id": 2306,
+        "game_id": "2025-08-30-201-2306"
+      }
+    },
+    {
+      "home": {
+        "name": "USC",
+        "abbr": "USC",
+        "logo": ""
+      },
+      "away": {
+        "name": "LSU",
+        "abbr": "LSU",
+        "logo": ""
+      },
+      "final": "45–42",
+      "recap_2s": "USC and LSU traded five lead changes in the second half, with neither defense finding answers. LSU's run game (7.1 yards per carry) exposed USC's aggressive safety play, while USC's air raid picked apart LSU's man coverage in key spots.",
+      "one_stat": "12 plays of 20+ yards",
+      "why_it_mattered": "Both teams' offensive coordinators exploited defensive tendencies: LSU ran power when USC crowded the box; USC targeted slot receivers when LSU rotated to single-high coverage. The final touchdown came on a fourth-quarter fake field goal that caught the return team off-guard.",
+      "tags": ["shootout", "upset", "special-teams"],
+      "ids": {
+        "home_id": 30,
+        "away_id": 99,
+        "game_id": "2025-08-29-30-99"
+      }
+    }
+  ],
+  "quick_opinions": [
+    "Fresno's defense is ahead of its offense; script needs tightening. The Bulldogs forced turnovers but struggled on early downs, creating too many third-and-longs that stalled drives.",
+    "USC's defensive coordinator needs to vary coverages against tempo. LSU's offense ran the same inside-zone concept nine times in the second half, and USC's safety rotation never adapted.",
+    "Texas's defensive line depth is deeper than advertised. The Longhorns rotated eight players and never lost containment on outside runs, even as Rice's offense tried to stretch the field horizontally.",
+    "Kansas State's quarterback showed better pocket presence than last year, but the Wildcats still can't protect against edge pressure. Three of Oklahoma's five sacks came from defensive ends running untouched into the backfield.",
+    "Arizona's two-minute drill execution faltered against Utah's aggressive blitzes. The Wildcats had a chance to ice the game late but took two offensive holding penalties that backed them out of field-goal range.",
+    "Utah's comeback was impressive, but relying on the quarterback as the primary runner is unsustainable. The Utes need more from their tailback committee or their signal-caller won't last past October.",
+    "Rice's explosive passing game kept the Owls competitive, but their red-zone efficiency (1-of-3) cost them a chance to pull the upset. They averaged 17.2 yards per completion but couldn't finish drives.",
+    "Third-down conversion rates across the board are down this weekend, suggesting defensive coordinators are winning the early-season chess matches. Offenses need to re-establish the run to set up passing windows."
+  ],
+  "whats_next": [
+    {
+      "when": "Fri",
+      "match": "Utah at Arizona",
+      "hook": "line watch"
+    },
+    {
+      "when": "Sat",
+      "match": "Texas at Kansas State",
+      "hook": "trench test"
+    },
+    {
+      "when": "Sat",
+      "match": "LSU at USC",
+      "hook": "shootout encore"
+    },
+    {
+      "when": "Sat",
+      "match": "Rice at Texas",
+      "hook": "upset alert"
+    }
+  ]
+}
+

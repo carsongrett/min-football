@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Five-Minute Football: Your weekly college football digest">
+  <link rel="manifest" href="manifest.webmanifest">
+  <title>Five-Minute Football</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.097222;
+      color: #1a1a1a;
+      background: #fff;
+      max-width: 430px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    header {
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    select, input {
+      padding: 6px 8px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+      border-radius: 4px;
+    }
+    input[type="search"] {
+      flex: 1;
+      min-width: 120px;
+    }
+    section {
+      margin-bottom: 32px;
+    }
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .section-meta {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    #top-games .games {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .game {
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .game:last-child { border-bottom: none; }
+    .game-header {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .game-logo {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+    .game-final {
+      color: #d00;
+      font-weight: 600;
+    }
+    .game-recap {
+      margin: 6px 0;
+      font-size: 14px;
+    }
+    .game-stat {
+      font-size: 13px;
+      color: #666;
+      font-style: italic;
+    }
+    .game-why {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #444;
+    }
+    #quick-opinions {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .opinion {
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    #whats-next {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .next-match {
+      font-size: 14px;
+    }
+    .next-match strong {
+      font-weight: 600;
+    }
+    .no-draft {
+      font-size: 14px;
+      color: #999;
+      font-style: italic;
+      padding: 8px 0;
+    }
+    @media (prefers-color-scheme: dark) {
+      body { background: #1a1a1a; color: #e0e0e0; }
+      .section-meta { color: #aaa; }
+      .game { border-color: #333; }
+      select, input { background: #2a2a2a; border-color: #444; color: #e0e0e0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Five-Minute Football</h1>
+    <div class="controls">
+      <select id="scope-select">
+        <option value="cfb">College</option>
+        <option value="nfl">NFL</option>
+      </select>
+      <select id="week-select">
+        <option value="current">This Week</option>
+      </select>
+      <input type="search" id="search" placeholder="Search..." aria-label="Search games and opinions">
+    </div>
+    <div class="section-meta" id="updated">Loading...</div>
+  </header>
+
+  <section id="top-games">
+    <h2>Top 5 Games You Missed</h2>
+    <div class="games"></div>
+  </section>
+
+  <section id="quick-opinions">
+    <h2>Quick Opinions</h2>
+    <div class="body"></div>
+  </section>
+
+  <section id="whats-next">
+    <h2>What's Next</h2>
+    <div class="body"></div>
+  </section>
+
+  <script src="assets/state.js"></script>
+  <script src="assets/render.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
+
