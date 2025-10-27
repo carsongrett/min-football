@@ -14,6 +14,7 @@ const __dirname = dirname(__filename);
 const SEASON = parseInt(process.env.SEASON) || new Date().getFullYear();
 const WEEK = parseInt(process.env.WEEK) || 1;
 const SCOPE = process.env.SCOPE || 'cfb';
+const API_KEY = process.env.CFBD_API_KEY;
 
 /**
  * Rank games by excitement and importance
@@ -21,37 +22,43 @@ const SCOPE = process.env.SCOPE || 'cfb';
  * @returns {Array} Ranked and filtered games
  */
 function rankGames(games) {
-  return games
+  // Filter to completed games only
+  const completed = games.filter(g => g.completed && g.home_points !== null && g.away_points !== null);
+  
+  return completed
     .map(game => {
       let score = 0;
+      const homeScore = game.home_points || 0;
+      const awayScore = game.away_points || 0;
+      const scoreDiff = Math.abs(homeScore - awayScore);
+      const totalPoints = homeScore + awayScore;
 
-      // Upset factor (bigger spread = more exciting)
-      const spread = Math.abs(parseFloat(game.spread) || 0);
-      if (game.upset) score += spread * 2;
+      // One-score finish (very exciting)
+      if (scoreDiff <= 8) score += 6;
+      if (scoreDiff <= 3) score += 4;
+      if (scoreDiff === 0) score += 3; // Ties
 
-      // One-score finish
-      const scoreDiff = Math.abs((game.home_score || 0) - (game.away_score || 0));
-      if (scoreDiff <= 8) score += 5;
-      if (scoreDiff <= 3) score += 3;
+      // High-scoring shootout
+      if (totalPoints > 70) score += 3;
+      if (totalPoints > 80) score += 2;
 
-      // Ranked matchup
-      if (game.ranked_vs_ranked) score += 4;
-      if (game.ranked_vs_unranked && game.upset) score += 6;
+      // Conference game gets small boost
+      if (game.conference_game) score += 1;
 
-      // OT games
-      if (game.overtime) score += 3;
-
-      // Lead changes in 4Q
-      if (game.lead_changes_4q) score += (game.lead_changes_4q || 0) * 2;
+      // Overtime games get extra points
+      if (game.periods === 5) score += 4; // 1 OT
+      if (game.periods > 5) score += 6;   // Multiple OTs
 
       game._rankScore = score;
+      game._scoreDiff = scoreDiff;
+      game._totalPoints = totalPoints;
+      game._winner = homeScore > awayScore ? 'home' : 'away';
       return game;
     })
     .sort((a, b) => b._rankScore - a._rankScore)
     .slice(0, 5)
     .map(game => {
-      // Remove internal scoring
-      delete game._rankScore;
+      // Keep internal data for recap generation
       return game;
     });
 }
@@ -62,65 +69,101 @@ function rankGames(games) {
  * @returns {Object} Game with generated text fields
  */
 function generateRecap(game) {
-  const isClose = Math.abs(game.home_score - game.away_score) <= 8;
-  const isUpset = game.upset;
-  const winner = game.winner;
+  const homeScore = game.home_points || 0;
+  const awayScore = game.away_points || 0;
+  const scoreDiff = game._scoreDiff;
+  const totalPoints = game._totalPoints;
+  const winner = game._winner;
+  const wonTeam = winner === 'home' ? game.home_team : game.away_team;
+  const lostTeam = winner === 'away' ? game.home_team : game.away_team;
 
-  // Simple template-based generation
-  const templates = [
-    `${winner} overcame ${isUpset ? 'an early deficit' : 'a slow start'} to secure the win.`,
-    `The game came down to ${game.turnovers > 0 ? 'turnovers' : 'red-zone efficiency'} in the final quarter.`,
-    `Both teams traded scores throughout, but ${winner} pulled away ${game.lead_changes_4q ? 'in the final minutes' : 'midway through the fourth quarter'}.`
-  ];
+  const isClose = scoreDiff <= 8;
+  const isShootout = totalPoints > 70;
+  const isOvertime = game.periods > 4;
 
-  game.recap_2s = templates.join(' ');
-  
-  // Generate one stat
-  if (game.turnovers > 2) {
-    game.one_stat = `Turnover margin ${game.winner === game.home_team ? '+' : '-'}${game.turnovers}`;
-  } else if (game.lead_changes_4q) {
-    game.one_stat = `${game.lead_changes_4q} lead changes in the 4th quarter`;
+  let sentence1 = '';
+  if (isOvertime) {
+    sentence1 = `${wonTeam} survived ${isShootout ? 'a back-and-forth shootout' : 'a tight contest'} that required overtime to decide.`;
+  } else if (isClose) {
+    sentence1 = isShootout 
+      ? `In a high-scoring affair, ${wonTeam} edged ${lostTeam} by ${scoreDiff} point${scoreDiff !== 1 ? 's' : ''}.`
+      : `${wonTeam} pulled out a narrow ${scoreDiff}-point victory over ${lostTeam}.`;
   } else {
-    game.one_stat = `${game.total_yards > 600 ? 'Combined ' + game.total_yards + ' total yards' : 'Red zone efficiency: ' + (game.redzone_efficiency || 'N/A')}`;
+    sentence1 = `${wonTeam} took control ${isShootout ? 'in the shootout' : 'early'} and maintained their lead throughout.`;
   }
 
-  // Why it mattered
-  const reasons = [];
-  if (game.defense_stops > 3) reasons.push('Defensive stops on critical downs decided the outcome');
-  if (game.special_teams_plays) reasons.push('Special teams execution swung field position');
-  if (game.fourth_quarter_comeback) reasons.push('A late rally showcased the winning team\'s resilience');
+  const sentence2 = isShootout
+    ? `Both teams' offenses moved the ball effectively, but ${winner === 'home' ? wonTeam + ' managed to get more stops' : lostTeam + ' fell short on crucial drives'}.`
+    : `The decisive moments came ${isClose ? 'late in the game' : 'when the winning team established momentum'}.`;
+
+  game.recap_2s = `${sentence1} ${sentence2}`;
   
-  game.why_it_mattered = reasons.join('. ') || 'Clutch plays in critical moments proved the difference';
+  if (isOvertime) {
+    game.one_stat = `${game.periods} periods total`;
+  } else if (isShootout) {
+    game.one_stat = `Combined ${totalPoints} points`;
+  } else if (isClose) {
+    game.one_stat = `${scoreDiff}-point margin`;
+  } else {
+    game.one_stat = `${wonTeam} won by ${scoreDiff}`;
+  }
+
+  const whyOptions = [
+    'Both teams showed resilience, but execution in key moments made the difference.',
+    isShootout ? 'The high-scoring affair showcased explosive offenses struggling to get defensive stops.' : 'Defensive discipline and limiting mistakes proved critical in the outcome.',
+    isClose ? 'A single big play or stop swung momentum in this tightly contested game.' : 'The winner established control and never let their opponent back in the game.'
+  ];
+  game.why_it_mattered = whyOptions[Math.floor(Math.random() * whyOptions.length)];
 
   return game;
 }
 
 /**
- * Fetch games from API (stub implementation)
- * In production, this would use CFBD API
+ * Fetch games from CFBD API or use stub
  */
 async function fetchGames(season, week, scope) {
-  // Stub: return sample data
-  // In production, replace with actual API call:
-  // const apiKey = process.env.CFBD_API_KEY;
-  // const response = await fetch(`https://api.collegefootballdata.com/games?year=${season}&week=${week}&seasonType=regular`);
-  
-  console.warn('⚠️  Using stub data. Set CFBD_API_KEY to fetch real data.');
-  
-  // Sample stub data structure
+  if (!API_KEY) {
+    console.warn('⚠️  No CFBD_API_KEY set. Using stub data.');
+    return getStubGames();
+  }
+
+  try {
+    console.log(`📡 Fetching games from CFBD API...`);
+    
+    // Fetch games for the week
+    const gamesUrl = `https://api.collegefootballdata.com/games?year=${season}&week=${week}&seasonType=regular`;
+    const gamesResponse = await fetch(gamesUrl, {
+      headers: { 'Authorization': `Bearer ${API_KEY}` }
+    });
+
+    if (!gamesResponse.ok) {
+      throw new Error(`API error: ${gamesResponse.status}`);
+    }
+
+    const games = await gamesResponse.json();
+    console.log(`✓ Found ${games.length} games`);
+
+    // Return games (box scores can be added later if needed)
+    return games;
+  } catch (error) {
+    console.error('❌ API fetch failed:', error.message);
+    console.warn('⚠️  Falling back to stub data.');
+    return getStubGames();
+  }
+}
+
+/**
+ * Return stub data when API is unavailable
+ */
+function getStubGames() {
   return [
     {
       id: `2025-08-30-278-290`,
       home_team: 'Fresno State',
       away_team: 'Georgia Southern',
-      home_score: 28,
-      away_score: 24,
-      completed: true,
-      upset: true,
-      spread: 14,
-      turnovers: 3,
-      lead_changes_4q: 0,
-      ranked_vs_unranked: true
+      home_points: 28,
+      away_points: 24,
+      completed: true
     }
   ];
 }
@@ -140,7 +183,7 @@ function mapToSchema(game, teamData) {
       abbr: teamData[game.away_team]?.abbr || game.away_team.substring(0, 4).toUpperCase(),
       logo: teamData[game.away_team]?.logo || ''
     },
-    final: `${game.home_score}–${game.away_score}`,
+    final: `${game.home_points}–${game.away_points}`,
     recap_2s: game.recap_2s || '',
     one_stat: game.one_stat || '',
     why_it_mattered: game.why_it_mattered || '',

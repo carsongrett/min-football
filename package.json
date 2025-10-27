@@ -1,0 +1,24 @@
+{
+  "name": "five-minute-football",
+  "version": "1.0.0",
+  "description": "A mobile-first weekly football digest",
+  "type": "module",
+  "scripts": {
+    "generate": "node scripts/generateDraft.mjs",
+    "generate:week": "node scripts/generateDraft.mjs",
+    "serve": "python -m http.server 8000"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "football",
+    "college-football",
+    "nfl",
+    "pwa",
+    "newsletter"
+  ],
+  "author": "",
+  "license": "MIT"
+}
+
