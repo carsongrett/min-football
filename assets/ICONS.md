@@ -35,3 +35,4 @@ If you have a logo file, resize it to these dimensions.
 
 After adding icons, check in DevTools > Application > Manifest to ensure they load correctly.
 
+
